@@ -5,7 +5,11 @@ uniform mat4 V;
 uniform mat4 M;
 
 in vec4 position;  
+in vec3 color;
+
+out vec3 colorForFP;
 
 void main() {	
+	colorForFP = color;
    gl_Position = P * V * M * position; 
 }

@@ -65,8 +65,9 @@ public class A0App implements GLEventListener {
     private int VMatrixID;
     private int PMatrixID;
     private int positionAttributeID;
-    
+    private int colorAttributeID;
     private int positionBufferID;
+    private int colorBufferID;
     private int elementBufferID;
     
     /** Vertices */
@@ -79,6 +80,18 @@ public class A0App implements GLEventListener {
     	     1, -1, -1,
     	     1,  1, -1,
     	    -1,  1, -1,
+    	  };
+    
+    /** Vertices */
+    private float[] colorData = {
+    	    0, 0, 0,
+    	    0, 0, 1,
+    	    0, 1, 0,
+    	    0, 1, 1,
+    	    1, 0, 0,
+    	    1, 0, 1,
+    	    1, 0, 0,
+    	    1, 1, 1,
     	  };
 
     /** Triangles */
@@ -119,16 +132,21 @@ public class A0App implements GLEventListener {
         VMatrixID = gl.glGetUniformLocation( glslProgramID, "V" );
         PMatrixID = gl.glGetUniformLocation( glslProgramID, "P" );
         positionAttributeID = gl.glGetAttribLocation( glslProgramID, "position" );
+        colorAttributeID = gl.glGetAttribLocation( glslProgramID, "color" );
 
         // Initialize the vertex and index buffers
         FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(positionData);
+        FloatBuffer colorBuffer = GLBuffers.newDirectFloatBuffer(colorData);
         ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
-        int[] bufferIDs = new int[2];
-        gl.glGenBuffers( 2, bufferIDs, 0 );
+        int[] bufferIDs = new int[3];
+        gl.glGenBuffers( 3, bufferIDs, 0 );
         positionBufferID = bufferIDs[0];
-        elementBufferID = bufferIDs[1];
+        colorBufferID = bufferIDs[1];
+        elementBufferID = bufferIDs[2];
         gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, positionBufferID );
         gl.glBufferData( GL4.GL_ARRAY_BUFFER, vertexBuffer.capacity() * Float.BYTES, vertexBuffer, GL4.GL_STATIC_DRAW );
+        gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, colorBufferID );
+        gl.glBufferData( GL4.GL_ARRAY_BUFFER, colorBuffer.capacity() * Float.BYTES, colorBuffer, GL4.GL_STATIC_DRAW );
         gl.glBindBuffer( GL4.GL_ELEMENT_ARRAY_BUFFER, elementBufferID );
         gl.glBufferData( GL4.GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity() * Short.BYTES, elementBuffer, GL4.GL_STATIC_DRAW );
     }
@@ -224,10 +242,14 @@ public class A0App implements GLEventListener {
         gl.glUseProgram( glslProgramID );
         
         gl.glEnableVertexAttribArray( positionAttributeID );
+        gl.glEnableVertexAttribArray( colorAttributeID );
         gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, positionBufferID );		
 		gl.glVertexAttribPointer( positionAttributeID, 3, GL4.GL_FLOAT, false, 3*Float.BYTES, 0 );
+		gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, colorBufferID );		
+		gl.glVertexAttribPointer( colorAttributeID, 3, GL4.GL_FLOAT, false, 3*Float.BYTES, 0 );
+		
 		gl.glBindBuffer( GL4.GL_ELEMENT_ARRAY_BUFFER, elementBufferID );
-		gl.glPolygonMode( GL4.GL_FRONT_AND_BACK, GL4.GL_LINE ); // otherwise GL_FILL is the default
+		gl.glPolygonMode( GL4.GL_FRONT_AND_BACK, GL4.GL_FILL ); // otherwise GL_FILL is the default
 		gl.glDrawElements( GL4.GL_TRIANGLES, elementData.length, GL4.GL_UNSIGNED_SHORT, 0 );
 		gl.glDisableVertexAttribArray( positionAttributeID );
    }
