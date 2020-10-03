@@ -14,6 +14,8 @@ import com.jogamp.opengl.util.glsl.ShaderProgram;
 
 import mintools.viewer.FontTexture;
 
+import java.util.Stack;
+
 /**
  * Basic GLSL transformation and lighting pipeline, along with a matrix stack
  * to help with hierarchical modeling.
@@ -38,8 +40,9 @@ public class BasicPipeline {
     public int positionAttributeID;
     public int normalAttributeID;
     
-    /** TODO: Objective 1: add a matrix stack to the basic pipeline */    
-   
+    /** TODO: Objective 1: add a matrix stack to the basic pipeline */
+    Stack<Matrix4d> stack = new Stack<Matrix4d>(); 
+    
 	/** TODO: Objective 1: Modeling matrix, make sure this is always the matrix at the top of the stack */
     private Matrix4d MMatrix = new Matrix4d();
     /** Inverse Transpose of Modeling matrix */
@@ -49,10 +52,39 @@ public class BasicPipeline {
     /** Projection matrix */
     private Matrix4d PMatrix = new Matrix4d();
     
+    
     private FontTexture fontTexture;
     
 	public BasicPipeline( GLAutoDrawable drawable ) {
 		// TODO: Objective 1: initialize your stack(s)?
+		
+		
+//	    MMatrix.set( new double[] {
+//	    		1,  0,  0,  0,
+//	    		0,  1,  0,  0,
+//	    		0,  0,  1,  0,
+//	    		0,  0,  0,  1,
+//	    } );
+//	    MinvTMatrix.set( new double[] {
+//	    		1,  0,  0,  0,
+//	    		0,  1,  0,  0,
+//	    		0,  0,  1,  0,
+//	    		0,  0,  0,  1,
+//	    } );
+//	    VMatrix.set( new double[] {
+//	    		1,  0,  0,  0,
+//	    		0,  1,  0,  0,
+//	    		0,  0,  1, -2.5f,
+//	    		0,  0,  0,  1,
+//	    } );
+//	    PMatrix.set( new double[] {
+//	    		1,  0,  0,  0,
+//	    		0,  1,  0,  0,
+//	    		0,  0, -2, -3,
+//	    		0,  0, -1,  1,
+//	    } );
+	    
+		
 		initMatricies();
 		
 		fontTexture = new FontTexture();
@@ -107,6 +139,9 @@ public class BasicPipeline {
 	 */
 	public void push() {
 		// TODO: Objective 1: stack push
+		
+		stack.push(MMatrix);
+		
 		throw new RuntimeErrorException( new Error("stack overflow") );
 	}
 
@@ -117,6 +152,9 @@ public class BasicPipeline {
 	 */
 	public void pop() {
 		// TODO: Objective 1: stack pop
+		
+		stack.pop();
+		
 		throw new RuntimeErrorException( new Error("stack underflow") );
 	}
 	
@@ -131,6 +169,16 @@ public class BasicPipeline {
 	 */
 	public void translate( double x, double y, double z ) {
 		// TODO: Objective 2: translate
+		
+		tmpMatrix4d.set( new double[] {
+	    		1,  0,  0,  x,
+	    		0,  1,  0,  y,
+	    		0,  0,  1,  z,
+	    		0,  0,  0,  1,
+	    } );
+		
+		MMatrix.mul(tmpMatrix4d);
+		MinvTMatrix.mul(tmpMatrix4d);
 	}
 
 	/**
@@ -142,6 +190,17 @@ public class BasicPipeline {
 	 */
 	public void scale( double x, double y, double z ) {
 		// TODO: Objective 2: scale
+		
+		tmpMatrix4d.set( new double[] {
+				x,  0,  0,  0,
+	    		0,  y,  0,  0,
+	    		0,  0,  z,  0,
+	    		0,  0,  0,  1,
+	    } );
+		
+		MMatrix.mul(tmpMatrix4d);
+		MinvTMatrix.mul(tmpMatrix4d);
+		
 	}
 	
 	/**
@@ -189,30 +248,30 @@ public class BasicPipeline {
     }
 	
 	public void initMatricies() {
-        MMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1,  0,
-        		0,  0,  0,  1,
-        } );
-        MinvTMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1,  0,
-        		0,  0,  0,  1,
-        } );
-        VMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1, -2.5,
-        		0,  0,  0,  1,
-        } );
-        PMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0, -2, -3,
-        		0,  0, -1,  1,
-        } );
+//        MMatrix.set( new double[] {
+//        		1,  0,  0,  0,
+//        		0,  1,  0,  0,
+//        		0,  0,  1,  0,
+//        		0,  0,  0,  1,
+//        } );
+//        MinvTMatrix.set( new double[] {
+//        		1,  0,  0,  0,
+//        		0,  1,  0,  0,
+//        		0,  0,  1,  0,
+//        		0,  0,  0,  1,
+//        } );
+//        VMatrix.set( new double[] {
+//        		1,  0,  0,  0,
+//        		0,  1,  0,  0,
+//        		0,  0,  1, -2.5,
+//        		0,  0,  0,  1,
+//        } );
+//        PMatrix.set( new double[] {
+//        		1,  0,  0,  0,
+//        		0,  1,  0,  0,
+//        		0,  0, -2, -3,
+//        		0,  0, -1,  1,
+//        } );
     }
     
     /**

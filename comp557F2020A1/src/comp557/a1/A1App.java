@@ -19,6 +19,8 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 import mintools.swing.ControlFrame;
 
+import comp557.a1.geom.*;
+
 /**​‌​​​‌‌​​​‌‌​​​‌​​‌‌‌​​‌
  * Class for Assignment 1, provides a viewing interface and keyframing interface for
  * a scene graph constructed with DAGNodes.
@@ -45,7 +47,7 @@ public class A1App implements GLEventListener {
     
     public A1App() {
         String windowName = "Assignment 1 - " + CharacterMaker.name;
-        GLProfile glp = GLProfile.getDefault();
+        GLProfile glp = GLProfile.get( GLProfile.GL4 );
         GLCapabilities glcap = new GLCapabilities(glp);
         GLCanvas glCanvas = new GLCanvas( glcap );
         final FPSAnimator animator; 
@@ -98,6 +100,7 @@ public class A1App implements GLEventListener {
         GL4 gl = drawable.getGL().getGL4();
         gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
         pipeline.enable( drawable );
+        Sphere.draw( drawable, pipeline );
         scene.display( drawable, pipeline );
         canvasRecorder.saveCanvasToFile( drawable );
     }
