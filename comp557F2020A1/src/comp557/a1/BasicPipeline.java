@@ -1,5 +1,7 @@
 package comp557.a1;
 
+import java.util.Stack;
+
 import javax.management.RuntimeErrorException;
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix4d;
@@ -13,8 +15,6 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 
 import mintools.viewer.FontTexture;
-
-import java.util.Stack;
 
 /**
  * Basic GLSL transformation and lighting pipeline, along with a matrix stack
@@ -41,8 +41,8 @@ public class BasicPipeline {
     public int normalAttributeID;
     
     /** TODO: Objective 1: add a matrix stack to the basic pipeline */
-    public Stack<Matrix4d> stack;
-    
+    public Stack<Matrix4d> mStack;
+   
 	/** TODO: Objective 1: Modeling matrix, make sure this is always the matrix at the top of the stack */
     private Matrix4d MMatrix = new Matrix4d();
     /** Inverse Transpose of Modeling matrix */
@@ -52,14 +52,13 @@ public class BasicPipeline {
     /** Projection matrix */
     private Matrix4d PMatrix = new Matrix4d();
     
-    
     private FontTexture fontTexture;
     
 	public BasicPipeline( GLAutoDrawable drawable ) {
 		// TODO: Objective 1: initialize your stack(s)?
-		stack = new Stack<Matrix4d>(); 
-		
+		mStack = new Stack<Matrix4d>();
 		initMatricies();
+		push();
 		
 		fontTexture = new FontTexture();
 		fontTexture.init(drawable);
@@ -103,6 +102,8 @@ public class BasicPipeline {
 	/** Sets the modeling matrix with the current top of the stack */
 	public void setModelingMatrixUniform( GL4 gl ) {
 		// TODO: Objective 1: make sure you send the top of the stack modeling and inverse transpose matrices to GLSL
+		push();
+		pop();
 		glUniformMatrix( gl, MMatrixID, MMatrix );
 		glUniformMatrix( gl, MinvTMatrixID, MinvTMatrix);
 	}
@@ -114,10 +115,13 @@ public class BasicPipeline {
 	public void push() {
 		// TODO: Objective 1: stack push
 		
-		stack.push(MinvTMatrix);
-		stack.push(MMatrix);
+		if(mStack.capacity()>64) {
+			throw new RuntimeErrorException( new Error("stack overflow") );
+		}else {
+			mStack.push((Matrix4d)MinvTMatrix.clone());
+			mStack.push((Matrix4d)MMatrix.clone());
+		}
 		
-//		throw new RuntimeErrorException( new Error("stack overflow") );
 	}
 
 	/** 
@@ -127,11 +131,12 @@ public class BasicPipeline {
 	 */
 	public void pop() {
 		// TODO: Objective 1: stack pop
-		
-		MMatrix = stack.pop();
-		MinvTMatrix = stack.pop();
-		
-//		throw new RuntimeErrorException( new Error("stack underflow") );
+		if(mStack.isEmpty()) {
+			throw new RuntimeErrorException( new Error("stack underflow") );
+		}else {
+			MMatrix=mStack.pop();
+			MinvTMatrix=mStack.pop();
+		}
 	}
 	
 	private Matrix4d tmpMatrix4d = new Matrix4d();
@@ -145,16 +150,14 @@ public class BasicPipeline {
 	 */
 	public void translate( double x, double y, double z ) {
 		// TODO: Objective 2: translate
-		
 		tmpMatrix4d.set( new double[] {
-	    		1,  0,  0,  x,
-	    		0,  1,  0,  y,
-	    		0,  0,  1,  z,
-	    		0,  0,  0,  1,
-	    } );
-		
+        		1,  0,  0,  x,
+        		0,  1,  0,  y,
+        		0,  0,  1,  z,
+        		0,  0,  0,  1,
+        } );
 		MMatrix.mul(tmpMatrix4d);
-		MinvTMatrix.mul(tmpMatrix4d);
+		MinvTMatrix.mul(tmpMatrix4d);		
 	}
 
 	/**
@@ -166,17 +169,14 @@ public class BasicPipeline {
 	 */
 	public void scale( double x, double y, double z ) {
 		// TODO: Objective 2: scale
-		
 		tmpMatrix4d.set( new double[] {
-				x,  0,  0,  0,
-	    		0,  y,  0,  0,
-	    		0,  0,  z,  0,
-	    		0,  0,  0,  1,
-	    } );
-		
+        		x,  0,  0,  0,
+        		0,  y,  0,  0,
+        		0,  0,  z,  0,
+        		0,  0,  0,  1,
+        } );
 		MMatrix.mul(tmpMatrix4d);
 		MinvTMatrix.mul(tmpMatrix4d);
-		
 	}
 	
 	/**
