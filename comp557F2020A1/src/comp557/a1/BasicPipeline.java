@@ -41,7 +41,7 @@ public class BasicPipeline {
     public int normalAttributeID;
     
     /** TODO: Objective 1: add a matrix stack to the basic pipeline */
-    Stack<Matrix4d> stack = new Stack<Matrix4d>(); 
+    Stack<Matrix4d> stack;
     
 	/** TODO: Objective 1: Modeling matrix, make sure this is always the matrix at the top of the stack */
     private Matrix4d MMatrix = new Matrix4d();
@@ -57,33 +57,7 @@ public class BasicPipeline {
     
 	public BasicPipeline( GLAutoDrawable drawable ) {
 		// TODO: Objective 1: initialize your stack(s)?
-		
-		
-//	    MMatrix.set( new double[] {
-//	    		1,  0,  0,  0,
-//	    		0,  1,  0,  0,
-//	    		0,  0,  1,  0,
-//	    		0,  0,  0,  1,
-//	    } );
-//	    MinvTMatrix.set( new double[] {
-//	    		1,  0,  0,  0,
-//	    		0,  1,  0,  0,
-//	    		0,  0,  1,  0,
-//	    		0,  0,  0,  1,
-//	    } );
-//	    VMatrix.set( new double[] {
-//	    		1,  0,  0,  0,
-//	    		0,  1,  0,  0,
-//	    		0,  0,  1, -2.5f,
-//	    		0,  0,  0,  1,
-//	    } );
-//	    PMatrix.set( new double[] {
-//	    		1,  0,  0,  0,
-//	    		0,  1,  0,  0,
-//	    		0,  0, -2, -3,
-//	    		0,  0, -1,  1,
-//	    } );
-	    
+		stack = new Stack<Matrix4d>(); 
 		
 		initMatricies();
 		
@@ -140,9 +114,10 @@ public class BasicPipeline {
 	public void push() {
 		// TODO: Objective 1: stack push
 		
+		stack.push(MinvTMatrix);
 		stack.push(MMatrix);
 		
-		throw new RuntimeErrorException( new Error("stack overflow") );
+//		throw new RuntimeErrorException( new Error("stack overflow") );
 	}
 
 	/** 
@@ -153,9 +128,10 @@ public class BasicPipeline {
 	public void pop() {
 		// TODO: Objective 1: stack pop
 		
-		stack.pop();
+		MMatrix = stack.pop();
+		MinvTMatrix = stack.pop();
 		
-		throw new RuntimeErrorException( new Error("stack underflow") );
+//		throw new RuntimeErrorException( new Error("stack underflow") );
 	}
 	
 	private Matrix4d tmpMatrix4d = new Matrix4d();
@@ -248,30 +224,30 @@ public class BasicPipeline {
     }
 	
 	public void initMatricies() {
-//        MMatrix.set( new double[] {
-//        		1,  0,  0,  0,
-//        		0,  1,  0,  0,
-//        		0,  0,  1,  0,
-//        		0,  0,  0,  1,
-//        } );
-//        MinvTMatrix.set( new double[] {
-//        		1,  0,  0,  0,
-//        		0,  1,  0,  0,
-//        		0,  0,  1,  0,
-//        		0,  0,  0,  1,
-//        } );
-//        VMatrix.set( new double[] {
-//        		1,  0,  0,  0,
-//        		0,  1,  0,  0,
-//        		0,  0,  1, -2.5,
-//        		0,  0,  0,  1,
-//        } );
-//        PMatrix.set( new double[] {
-//        		1,  0,  0,  0,
-//        		0,  1,  0,  0,
-//        		0,  0, -2, -3,
-//        		0,  0, -1,  1,
-//        } );
+        MMatrix.set( new double[] {
+        		1,  0,  0,  0,
+        		0,  1,  0,  0,
+        		0,  0,  1,  0,
+        		0,  0,  0,  1,
+        } );
+        MinvTMatrix.set( new double[] {
+        		1,  0,  0,  0,
+        		0,  1,  0,  0,
+        		0,  0,  1,  0,
+        		0,  0,  0,  1,
+        } );
+        VMatrix.set( new double[] {
+        		1,  0,  0,  0,
+        		0,  1,  0,  0,
+        		0,  0,  1, -2.5,
+        		0,  0,  0,  1,
+        } );
+        PMatrix.set( new double[] {
+        		1,  0,  0,  0,
+        		0,  1,  0,  0,
+        		0,  0, -2, -3,
+        		0,  0, -1,  1,
+        } );
     }
     
     /**
