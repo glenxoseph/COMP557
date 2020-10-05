@@ -41,7 +41,7 @@ public class BasicPipeline {
     public int normalAttributeID;
     
     /** TODO: Objective 1: add a matrix stack to the basic pipeline */
-    Stack<Matrix4d> stack;
+    public Stack<Matrix4d> stack;
     
 	/** TODO: Objective 1: Modeling matrix, make sure this is always the matrix at the top of the stack */
     private Matrix4d MMatrix = new Matrix4d();

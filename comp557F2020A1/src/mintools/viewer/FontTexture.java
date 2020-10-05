@@ -63,7 +63,7 @@ public class FontTexture implements GLEventListener {
 	    	texture.enable(gl);
 	    	texture.bind(gl);
 	    	gl.glBindTexture(gl.GL_TEXTURE_2D, texture.getTextureObject());
-	    	gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
+//	    	gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
     	} catch (Exception e) {
 			e.printStackTrace();
     	}
@@ -99,7 +99,7 @@ public class FontTexture implements GLEventListener {
         // need to set these every time if other people are using textures... 
         gl.glActiveTexture( GL4.GL_TEXTURE0 );
       	gl.glTexParameterf( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MAG_FILTER, GL4.GL_LINEAR ); // will be set again elsewhere for demo        
-      	gl.glTexParameterf( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR_MIPMAP_LINEAR ); // will be set again elsewhere for demo 
+      	gl.glTexParameterf( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR ); //  was _MIPMAP_LINEAR );  // will be set again elsewhere for demo 
         float[] fa= new float[1];
         gl.glGetFloatv(GL.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, fa, 0 );
         gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, fa[0]);        

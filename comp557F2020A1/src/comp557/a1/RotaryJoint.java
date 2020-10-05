@@ -23,10 +23,7 @@ public class RotaryJoint extends GraphNode {
 			dofs.add(this.ry = (new DoubleParameter(name+" ry", def, min, max)));
 			if(axis.equals("z"))
 			dofs.add(this.rz = (new DoubleParameter(name+" rz", def, min, max)));
-			
-			
 		}
-
 
 		public void display(GLAutoDrawable drawable,BasicPipeline pipeline) {
 			GL4 gl = drawable.getGL().getGL4();
