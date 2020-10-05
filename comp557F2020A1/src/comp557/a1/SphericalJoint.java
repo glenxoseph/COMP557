@@ -34,7 +34,6 @@ public class SphericalJoint extends GraphNode{
 		pipeline.rotate(rx.getValue(), 1, 0, 0);
 		pipeline.rotate(ry.getValue(), 0, 1, 0);
 		pipeline.rotate(rz.getValue(), 0, 0, 1);
-
 		
 		pipeline.setModelingMatrixUniform(gl);
 		super.display( drawable, pipeline );		
