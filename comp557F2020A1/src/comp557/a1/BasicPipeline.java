@@ -33,11 +33,20 @@ public class BasicPipeline {
     /** TODO: Objective 7: material properties, minimally kd is set up, but add more as necessary */
     /** You will want to use this with a glUniform3f call to set the r g b reflectance properties, each being between 0 and 1 */
     public int kdID;
+    public int ksID;
+    public int shininessID;
     
     /** TODO: Objective 8: lighting direction, minimally one direction is setup , but add more as necessary */
-    public int lightDirID;
-    
-    public int positionAttributeID;
+
+    public int viewDirID; 
+    public int keyDirID; 
+    public int fillDirID; 
+    public int backDirID; 
+    public int keyColorID; 
+    public int fillColorID; 
+    public int backColorID;
+
+    public int positionAttributeID; 
     public int normalAttributeID;
     
     /** TODO: Objective 1: add a matrix stack to the basic pipeline */
@@ -58,7 +67,7 @@ public class BasicPipeline {
 		// TODO: Objective 1: initialize your stack(s)?
 		mStack = new Stack<Matrix4d>();
 		initMatricies();
-		push();
+		//push();
 		
 		fontTexture = new FontTexture();
 		fontTexture.init(drawable);
@@ -67,15 +76,24 @@ public class BasicPipeline {
 		// Create the GLSL program 
 		glslProgramID = createProgram( drawable, "basicLighting" );
 		// Get the IDs of the parameters (i.e., uniforms and attributes)
+		
         gl.glUseProgram( glslProgramID );
         MMatrixID = gl.glGetUniformLocation( glslProgramID, "M" );
         MinvTMatrixID = gl.glGetUniformLocation( glslProgramID, "MinvT" );
         VMatrixID = gl.glGetUniformLocation( glslProgramID, "V" );
         PMatrixID = gl.glGetUniformLocation( glslProgramID, "P" );
+        
         kdID = gl.glGetUniformLocation( glslProgramID, "kd" );
-        lightDirID = gl.glGetUniformLocation( glslProgramID, "lightDir" );
+        ksID = gl.glGetUniformLocation( glslProgramID, "ks" );
         positionAttributeID = gl.glGetAttribLocation( glslProgramID, "position" );
         normalAttributeID = gl.glGetAttribLocation( glslProgramID, "normal" );
+        
+        viewDirID= gl.glGetUniformLocation(glslProgramID, "viewDir"); 
+        keyDirID= gl.glGetUniformLocation(glslProgramID, "keyDir"); 
+        fillDirID= gl.glGetUniformLocation(glslProgramID, "fillDir"); 
+        backDirID= gl.glGetUniformLocation(glslProgramID, "backDir");
+        
+        shininessID= gl.glGetUniformLocation(glslProgramID, "shininess");
 	}
 	
 	/**
@@ -94,9 +112,36 @@ public class BasicPipeline {
         glUniformMatrix( gl, MinvTMatrixID, MinvTMatrix );
 
         // TODO: Objective 7: GLSL lighting, you may want to provide 
-        Vector3f lightDir = new Vector3f( 1, 1, 1 );
-        lightDir.normalize();
-        gl.glUniform3f( lightDirID, lightDir.x, lightDir.y, lightDir.z );
+        
+        Vector3f lightDir;
+        Vector3f fillColor = new Vector3f(0.3f,0.3f, 0.3f);
+        Vector3f keyColor = new Vector3f(0.8f,0.8f, 0.8f);
+        Vector3f backColor = new Vector3f(0.6f,0.6f, 0.6f);
+
+
+        lightDir = new Vector3f( -0.6f, 0.2f, 0.75f);
+        lightDir. normalize();
+        gl.glUniform3f( keyDirID,lightDir.x, lightDir.y, lightDir.z ); 
+        gl.glUniform3f( keyColorID, keyColor.x, keyColor.y, keyColor.z );
+
+
+         lightDir = new Vector3f(0.6f, 0.2f, 0.75f);
+         lightDir. normalize();;
+        gl.glUniform3f( fillDirID,lightDir.x, lightDir.y, lightDir.z ); 
+        gl.glUniform3f( fillColorID, fillColor.x, fillColor.y, fillColor.z );
+
+
+        lightDir = new Vector3f( 0.6f, 0.2f, -0.75f);
+        lightDir. normalize();
+        gl.glUniform3f( backDirID,lightDir.x, lightDir.y, lightDir.z ); 
+        gl.glUniform3f( backColorID, backColor.x, backColor.y, backColor.z );
+
+
+        Vector3f viewDir = new Vector3f( 1.0f, 1.0f, 1.0f ); 
+        viewDir.normalize();
+        gl.glUniform3f(viewDirID, viewDir.x, viewDir.y, viewDir.z); 
+        gl.glUniform1f(shininessID, 1);
+        gl.glUniform3f(ksID, 0.9f,0.9f,0.9f);
 	}
 	
 	/** Sets the modeling matrix with the current top of the stack */
@@ -157,7 +202,8 @@ public class BasicPipeline {
         		0,  0,  0,  1,
         } );
 		MMatrix.mul(tmpMatrix4d);
-		MinvTMatrix.mul(tmpMatrix4d);		
+		tmpMatrix4d.invert(MMatrix);
+		MinvTMatrix.transpose(tmpMatrix4d);	
 	}
 
 	/**
@@ -176,7 +222,8 @@ public class BasicPipeline {
         		0,  0,  0,  1,
         } );
 		MMatrix.mul(tmpMatrix4d);
-		MinvTMatrix.mul(tmpMatrix4d);
+		tmpMatrix4d.invert(MMatrix);
+		MinvTMatrix.transpose(tmpMatrix4d);
 	}
 	
 	/**
