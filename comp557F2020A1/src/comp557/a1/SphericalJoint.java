@@ -1,5 +1,6 @@
 package comp557.a1;
 
+import javax.vecmath.Tuple2d;
 import javax.vecmath.Tuple3d;
 
 import com.jogamp.opengl.GL4;
@@ -9,28 +10,27 @@ import mintools.parameters.DoubleParameter;
 
 public class SphericalJoint extends GraphNode{
 
-	double tx,ty,tz;
+	DoubleParameter tx,ty,tz;
 	DoubleParameter rx,ry,rz;
 	
-	public SphericalJoint(String name,double tx, double x_def, double x_min, double x_max,
-			                          double ty, double y_def, double y_min, double y_max,
-			                          double tz, double z_def, double z_min, double z_max) {
+	public SphericalJoint(String name) {
 		super(name);
-		this.tx=tx;
-		this.ty=ty;
-		this.tz=tz;
-		dofs.add( rx = new DoubleParameter( name+" rx", x_def, x_min, x_max ) );		
-		dofs.add( ry = new DoubleParameter( name+" ry", y_def, y_min, y_max ) );
-		dofs.add( rz = new DoubleParameter( name+" rz", z_def, z_min, z_max ) );
+
+		tx = new DoubleParameter( name + " tx", 0, -4, 4 );
+		ty = new DoubleParameter( name + " ty", 0, -4, 4 );
+		tz = new DoubleParameter( name + " tz", 0, -4, 4 );
+		dofs.add( rx = new DoubleParameter( name + " rx", 0, -180, 180 ) );		
+		dofs.add( ry = new DoubleParameter( name + " ry", 0, -180, 180 ) );
+		dofs.add( rz = new DoubleParameter( name + " rz", 0, -180, 180 ) );
 	}
 	
 	public void display(GLAutoDrawable drawable,BasicPipeline pipeline) {
 		GL4 gl = drawable.getGL().getGL4();
 		pipeline.push();
 		
-		pipeline.translate(tx,0,0);
-		pipeline.translate(0,ty,0);
-		pipeline.translate(0,0,tz);
+		pipeline.translate(tx.getValue(), 0, 0);
+		pipeline.translate(0, ty.getValue(), 0);
+		pipeline.translate(0, 0, tz.getValue());
 		pipeline.rotate(rx.getValue(), 1, 0, 0);
 		pipeline.rotate(ry.getValue(), 0, 1, 0);
 		pipeline.rotate(rz.getValue(), 0, 0, 1);
@@ -43,9 +43,27 @@ public class SphericalJoint extends GraphNode{
 
 	public void setPosition(Tuple3d position) {
 		
-		this.tx=position.x;
-		this.ty=position.y;
-		this.tz=position.z;
+		this.tx.setValue(position.x);
+		this.ty.setValue(position.y);
+		this.tz.setValue(position.z);
+	}
+	
+	public void setDegrees(Tuple3d degrees, Tuple3d x, Tuple3d y, Tuple3d z) {
+		this.rx.setValue(degrees.x);
+		this.ry.setValue(degrees.y);
+		this.rz.setValue(degrees.z);
+		
+		this.rx.setMinimum(x.x);
+		this.rx.setMaximum(x.y);
+		this.rx.setDefaultValue(x.z);
+		
+		this.ry.setMinimum(y.x);
+		this.ry.setMaximum(y.y);
+		this.ry.setDefaultValue(y.z);
+		
+		this.rz.setMinimum(z.x);
+		this.rz.setMaximum(z.y);
+		this.rz.setDefaultValue(y.z);
 	}
 }
 

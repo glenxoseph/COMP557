@@ -7,22 +7,30 @@ import com.jogamp.opengl.GLAutoDrawable;
 import mintools.parameters.DoubleParameter;
 
 public class RotaryJoint extends GraphNode {
-	double tx,ty,tz;
-	String axis;
-	DoubleParameter rx,ry,rz;
 	
-		public RotaryJoint(String name,double tx, double ty, double tz, String axis, double min, double max, double def) {
+	DoubleParameter tx;
+	DoubleParameter ty;
+	DoubleParameter tz;
+	DoubleParameter r;
+	
+	String axis;
+	
+		public RotaryJoint(String name) {
 			super(name);
-			this.tx=tx;
-			this.ty=ty;
-			this.tz=tz;
+			tx = new DoubleParameter( name+" tx", 0, -2, 2 );
+			ty = new DoubleParameter( name+" ty", 0, -2, 2 );
+			tz = new DoubleParameter( name+" tz", 0, -2, 2 );
+			dofs.add(r = new DoubleParameter(name+" degree", 0, -180, 180));
+		}
+		
+		
+		public void rotate(String axis, Tuple3d minMaxDef) {
 			this.axis=axis;
-			if(axis.equals("x"))
-			dofs.add(this.rx = (new DoubleParameter(name+" rx", def, min, max)));
-			if(axis.equals("y"))
-			dofs.add(this.ry = (new DoubleParameter(name+" ry", def, min, max)));
-			if(axis.equals("z"))
-			dofs.add(this.rz = (new DoubleParameter(name+" rz", def, min, max)));
+			
+			this.r.setMinimum(minMaxDef.x);
+			this.r.setMaximum(minMaxDef.y);
+			this.r.setDefaultValue(minMaxDef.z);
+			
 		}
 
 		public void display(GLAutoDrawable drawable,BasicPipeline pipeline) {
@@ -30,14 +38,17 @@ public class RotaryJoint extends GraphNode {
 			pipeline.setModelingMatrixUniform(gl);
 			pipeline.push();
 			
-			pipeline.translate(tx,ty,tz);
+			pipeline.translate(tx.getValue(), ty.getValue(), tz.getValue());
 			
-			if(axis.equals("x"))
-				pipeline.rotate(rx.getValue(), 1, 0, 0);
-			if(axis.equals("y"))
-				pipeline.rotate(ry.getValue(), 0, 1, 0);
-			if(axis.equals("z"))
-				pipeline.rotate(rz.getValue(), 0, 0, 1);
+			if(axis.equals("x")) {
+				pipeline.rotate(r.getValue(), 1, 0, 0);
+			}
+			else if(axis.equals("y")) {
+				pipeline.rotate(r.getValue(), 0, 1, 0);
+			}	
+			else if (axis.equals("z")) {
+				pipeline.rotate(r.getValue(), 0, 0, 1);
+			}
 			
 			pipeline.setModelingMatrixUniform(gl);
 			super.display( drawable, pipeline );		
@@ -45,10 +56,9 @@ public class RotaryJoint extends GraphNode {
 		}
 
 		public void setPosition(Tuple3d position) {
-			
-			this.tx=position.x;
-			this.ty=position.y;
-			this.tz=position.z;
+			this.tx.setValue(position.x);
+			this.ty.setValue(position.y);
+			this.tz.setValue(position.z);
 		}
 }
 		

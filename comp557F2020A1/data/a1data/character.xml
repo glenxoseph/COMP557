@@ -1,10 +1,59 @@
 <?xml version="1.0"?>
 <!-- hierachrical definition of a character -->
 <doc>
-    <node type="freejoint" name="root">
-    	<geom type="box" name="torso" center="0 0.5 0" scale="1 1 0.5"  />
-    	<node type="spherical" name="r shoulder" position="-0.5 1 0">
-        	<geom type="box" name="upper r arm" center="0 -0.5 0" scale="0.2 1 0.2" />
-    	</node>
-	</node>
+  <node type="free" name="root">
+    <geom type="CUBE" name="torso" translate="0 1.5 0" rotate="0 0 0 " scale="1.5 2 1" rgb="1 1 1"/>
+
+    <!-- head -->
+
+    <node type="spherical" name="neck" position="0 2.5 0" degrees="0 0 0" x="-0.5 0.5 0" y="-1 1 0" z="-0.5 0.5 0">
+      <geom type="CUBE" name="neck" translate="0 0.2 0" rotate="0 0 0 " scale="0.3 0.3 0.3" rgb="1 1 1"/>
+      <geom type="SPHERE" name="head" translate="0 0.8 0" rotate="0 0 0 " scale="0.7 0.7 0.7" rgb="1 1 1"/>
+      <geom type="SPHERE" name="left eye" translate="-0.3 0.8 0.7" rotate="0 0 0 " scale="0.1 0.1 0.1" rgb="0 0 0"/>
+      <geom type="SPHERE" name="right eye" translate="0.3 0.8 0.7" rotate="0 0 0 " scale="0.1 0.1 0.1" rgb="0 0 0"/>
+    </node>
+
+    <!-- right arm -->
+
+    <node type="rotary" name="r shoulder" position="-1 2.5 0" axis="z" rotate="-3 0 0">
+      <geom type="CUBE" name="upper r arm" translate="0 -0.4 0" rotate="0 0 0 " scale="0.3 1.2 0.3" rgb="0 1 0"/>
+      <node type="rotary" name="r elbow" position="0 -1 0" axis="x" rotate="-3 0 0">
+        <geom type="CUBE" name="lower r arm" translate="0 -0.5 0" rotate="0 0 0 " scale="0.3 1.2 0.3" rgb="0 1 0"/>
+      </node>
+    </node>
+
+    <!-- left arm -->
+
+    <node type="rotary" name="l shoulder" position="1 2.5 0" axis="z" rotate="0 3 0">
+      <geom type="CUBE" name="upper l arm" translate="0 -0.4 0" rotate="0 0 0 " scale="0.3 1.2 0.3" rgb="1 0 0"/>
+      <node type="rotary" name="l elbow" position="0 -1 0" axis="x" rotate="-3 0 0">
+        <geom type="CUBE" name="lower l arm" translate="0 -0.5 0" rotate="0 0 0 " scale="0.3 1.2 0.3" rgb="1 0 0"/>
+      </node>
+    </node>
+
+    <!-- right leg -->
+
+    <node type="rotary" name="r cheek" position="-0.5 0.1 0" axis="x" rotate="-3 0 0">
+      <geom type="CUBE" name="upper r leg" translate="0 -0.4 0" rotate="0 0 0 " scale="0.7 1.5 0.7" rgb="1 1 0"/>
+      <node type="rotary" name="r knee" position="0 -1 0" axis="x" rotate="0 3 0">
+        <geom type="CUBE" name="lower r leg" translate="0 -0.7 0" rotate="0 0 0 " scale="0.7 1.5 0.7" rgb="1 1 0"/>
+        <node type="rotary" name="r ankle" position="0 -1 0" axis="x" rotate="-0.5 0.5 0">
+          <geom type="CUBE" name="lower r foot" translate="0 -0.7 0.5" rotate="0 0 0 " scale="0.5 0.2 1" rgb="0 0 0"/>
+        </node>
+      </node>
+    </node>
+
+    <!-- left leg -->
+
+    <node type="rotary" name="l cheek" position="0.5 0.1 0" axis="x" rotate="-3 0 0">
+      <geom type="CUBE" name="upper l leg" translate="0 -0.4 0" rotate="0 0 0 " scale="0.7 1.5 0.7" rgb="1 1 0"/>
+      <node type="rotary" name="l knee" position="0 -1 0" axis="x" rotate="0 3 0">
+        <geom type="CUBE" name="lower l leg" translate="0 -0.7 0" rotate="0 0 0 " scale="0.7 1.5 0.7" rgb="1 1 0"/>
+        <node type="rotary" name="r ankle" position="0 -1 0" axis="x" rotate="-0.5 0.5 0">
+          <geom type="CUBE" name="lower l foot" translate="0 -0.7 0.5" rotate="0 0 0 " scale="0.5 0.2 1" rgb="0 0 0"/>
+        </node>
+      </node>
+    </node>
+
+  </node>
 </doc>

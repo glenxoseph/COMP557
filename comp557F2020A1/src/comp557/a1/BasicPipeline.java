@@ -23,79 +23,81 @@ import mintools.viewer.FontTexture;
  */
 public class BasicPipeline {
 
-    private int glslProgramID;
-    
-    public int MMatrixID;
-    public int MinvTMatrixID;
-    public int VMatrixID;
-    public int PMatrixID;
-    
-    /** TODO: Objective 7: material properties, minimally kd is set up, but add more as necessary */
-    /** You will want to use this with a glUniform3f call to set the r g b reflectance properties, each being between 0 and 1 */
-    public int kdID;
-    public int ksID;
-    public int shininessID;
-    
-    /** TODO: Objective 8: lighting direction, minimally one direction is setup , but add more as necessary */
+	private int glslProgramID;
 
-    public int viewDirID; 
-    public int keyDirID; 
-    public int fillDirID; 
-    public int backDirID; 
-    public int keyColorID; 
-    public int fillColorID; 
-    public int backColorID;
+	public int MMatrixID;
+	public int MinvTMatrixID;
+	public int VMatrixID;
+	public int PMatrixID;
 
-    public int positionAttributeID; 
-    public int normalAttributeID;
-    
-    /** TODO: Objective 1: add a matrix stack to the basic pipeline */
-    public Stack<Matrix4d> mStack;
-   
+	/** TODO: Objective 7: material properties, minimally kd is set up, but add more as necessary */
+	/** You will want to use this with a glUniform3f call to set the r g b reflectance properties, each being between 0 and 1 */
+	public int kdID;
+	public int ksID;
+
+	public int viewDirID; 
+	public int keyDirID; 
+	public int fillDirID; 
+	public int backDirID; 
+
+	public int keyColorID; 
+	public int fillColorID; 
+	public int backColorID;
+	public int shininessID;
+
+	public int positionAttributeID; 
+	public int normalAttributeID;
+
+	/** TODO: Objective 8: lighting direction, minimally one direction is setup , but add more as necessary */
+
+
+	/** TODO: Objective 1: add a matrix stack to the basic pipeline */
+	public Stack<Matrix4d> mStack;
+
 	/** TODO: Objective 1: Modeling matrix, make sure this is always the matrix at the top of the stack */
-    private Matrix4d MMatrix = new Matrix4d();
-    /** Inverse Transpose of Modeling matrix */
-    private Matrix4d MinvTMatrix = new Matrix4d();
-    /** View matrix */
-    private Matrix4d VMatrix = new Matrix4d();
-    /** Projection matrix */
-    private Matrix4d PMatrix = new Matrix4d();
-    
-    private FontTexture fontTexture;
-    
+	private Matrix4d MMatrix = new Matrix4d();
+	/** Inverse Transpose of Modeling matrix */
+	private Matrix4d MinvTMatrix = new Matrix4d();
+	/** View matrix */
+	private Matrix4d VMatrix = new Matrix4d();
+	/** Projection matrix */
+	private Matrix4d PMatrix = new Matrix4d();
+
+	private FontTexture fontTexture;
+
 	public BasicPipeline( GLAutoDrawable drawable ) {
 		// TODO: Objective 1: initialize your stack(s)?
 		mStack = new Stack<Matrix4d>();
 		initMatricies();
 		//push();
-		
+
 		fontTexture = new FontTexture();
 		fontTexture.init(drawable);
-		
+
 		GL4 gl = drawable.getGL().getGL4();
 		// Create the GLSL program 
 		glslProgramID = createProgram( drawable, "basicLighting" );
 		// Get the IDs of the parameters (i.e., uniforms and attributes)
-		
-        gl.glUseProgram( glslProgramID );
-        MMatrixID = gl.glGetUniformLocation( glslProgramID, "M" );
-        MinvTMatrixID = gl.glGetUniformLocation( glslProgramID, "MinvT" );
-        VMatrixID = gl.glGetUniformLocation( glslProgramID, "V" );
-        PMatrixID = gl.glGetUniformLocation( glslProgramID, "P" );
-        
-        kdID = gl.glGetUniformLocation( glslProgramID, "kd" );
-        ksID = gl.glGetUniformLocation( glslProgramID, "ks" );
-        positionAttributeID = gl.glGetAttribLocation( glslProgramID, "position" );
-        normalAttributeID = gl.glGetAttribLocation( glslProgramID, "normal" );
-        
-        viewDirID= gl.glGetUniformLocation(glslProgramID, "viewDir"); 
-        keyDirID= gl.glGetUniformLocation(glslProgramID, "keyDir"); 
-        fillDirID= gl.glGetUniformLocation(glslProgramID, "fillDir"); 
-        backDirID= gl.glGetUniformLocation(glslProgramID, "backDir");
-        
-        shininessID= gl.glGetUniformLocation(glslProgramID, "shininess");
+
+		gl.glUseProgram( glslProgramID );
+		MMatrixID = gl.glGetUniformLocation( glslProgramID, "M" );
+		MinvTMatrixID = gl.glGetUniformLocation( glslProgramID, "MinvT" );
+		VMatrixID = gl.glGetUniformLocation( glslProgramID, "V" );
+		PMatrixID = gl.glGetUniformLocation( glslProgramID, "P" );
+
+		kdID = gl.glGetUniformLocation( glslProgramID, "kd" );
+		ksID = gl.glGetUniformLocation( glslProgramID, "ks" );
+		positionAttributeID = gl.glGetAttribLocation( glslProgramID, "position" );
+		normalAttributeID = gl.glGetAttribLocation( glslProgramID, "normal" );
+
+		viewDirID= gl.glGetUniformLocation(glslProgramID, "viewDir"); 
+		keyDirID= gl.glGetUniformLocation(glslProgramID, "keyDir"); 
+		fillDirID= gl.glGetUniformLocation(glslProgramID, "fillDir"); 
+		backDirID= gl.glGetUniformLocation(glslProgramID, "backDir");
+
+		shininessID= gl.glGetUniformLocation(glslProgramID, "shininess");
 	}
-	
+
 	/**
 	 * Enables the basic pipeline, sets viewing and projection matrices, and enables
 	 * the position and normal vertex attributes
@@ -103,47 +105,47 @@ public class BasicPipeline {
 	 */
 	public void enable( GLAutoDrawable drawable ) {
 		GL4 gl = drawable.getGL().getGL4();
-        gl.glUseProgram( glslProgramID );
+		gl.glUseProgram( glslProgramID );
 		gl.glEnableVertexAttribArray( positionAttributeID );
-        gl.glEnableVertexAttribArray( normalAttributeID );
-        glUniformMatrix( gl, VMatrixID, VMatrix );
-        glUniformMatrix( gl, PMatrixID, PMatrix );
-        glUniformMatrix( gl, MMatrixID, MMatrix );
-        glUniformMatrix( gl, MinvTMatrixID, MinvTMatrix );
+		gl.glEnableVertexAttribArray( normalAttributeID );
+		glUniformMatrix( gl, VMatrixID, VMatrix );
+		glUniformMatrix( gl, PMatrixID, PMatrix );
+		glUniformMatrix( gl, MMatrixID, MMatrix );
+		glUniformMatrix( gl, MinvTMatrixID, MinvTMatrix );
 
-        // TODO: Objective 7: GLSL lighting, you may want to provide 
-        
-        Vector3f lightDir;
-        Vector3f fillColor = new Vector3f(0.3f,0.3f, 0.3f);
-        Vector3f keyColor = new Vector3f(0.8f,0.8f, 0.8f);
-        Vector3f backColor = new Vector3f(0.6f,0.6f, 0.6f);
+		// TODO: Objective 7: GLSL lighting, you may want to provide 
 
-
-        lightDir = new Vector3f( -0.6f, 0.2f, 0.75f);
-        lightDir. normalize();
-        gl.glUniform3f( keyDirID,lightDir.x, lightDir.y, lightDir.z ); 
-        gl.glUniform3f( keyColorID, keyColor.x, keyColor.y, keyColor.z );
+		Vector3f lightDir;
+		Vector3f fillColor = new Vector3f(0.3f,0.3f, 0.3f);
+		Vector3f keyColor = new Vector3f(0.8f,0.8f, 0.8f);
+		Vector3f backColor = new Vector3f(0.6f,0.6f, 0.6f);
 
 
-         lightDir = new Vector3f(0.6f, 0.2f, 0.75f);
-         lightDir. normalize();;
-        gl.glUniform3f( fillDirID,lightDir.x, lightDir.y, lightDir.z ); 
-        gl.glUniform3f( fillColorID, fillColor.x, fillColor.y, fillColor.z );
+		lightDir = new Vector3f( -0.6f, 0.2f, 0.75f);
+		lightDir. normalize();
+		gl.glUniform3f( keyDirID,lightDir.x, lightDir.y, lightDir.z ); 
+		gl.glUniform3f( keyColorID, keyColor.x, keyColor.y, keyColor.z );
 
 
-        lightDir = new Vector3f( 0.6f, 0.2f, -0.75f);
-        lightDir. normalize();
-        gl.glUniform3f( backDirID,lightDir.x, lightDir.y, lightDir.z ); 
-        gl.glUniform3f( backColorID, backColor.x, backColor.y, backColor.z );
+		lightDir = new Vector3f(0.6f, 0.2f, 0.75f);
+		lightDir. normalize();;
+		gl.glUniform3f( fillDirID,lightDir.x, lightDir.y, lightDir.z ); 
+		gl.glUniform3f( fillColorID, fillColor.x, fillColor.y, fillColor.z );
 
 
-        Vector3f viewDir = new Vector3f( 1.0f, 1.0f, 1.0f ); 
-        viewDir.normalize();
-        gl.glUniform3f(viewDirID, viewDir.x, viewDir.y, viewDir.z); 
-        gl.glUniform1f(shininessID, 1);
-        gl.glUniform3f(ksID, 0.9f,0.9f,0.9f);
+		lightDir = new Vector3f( 0.6f, 0.2f, -0.75f);
+		lightDir. normalize();
+		gl.glUniform3f( backDirID,lightDir.x, lightDir.y, lightDir.z ); 
+		gl.glUniform3f( backColorID, backColor.x, backColor.y, backColor.z );
+
+
+		Vector3f viewDir = new Vector3f( 1.0f, 1.0f, 1.0f ); 
+		viewDir.normalize();
+		gl.glUniform3f(viewDirID, viewDir.x, viewDir.y, viewDir.z); 
+		gl.glUniform1f(shininessID, 1);
+		gl.glUniform3f(ksID, 0.9f,0.9f,0.9f);
 	}
-	
+
 	/** Sets the modeling matrix with the current top of the stack */
 	public void setModelingMatrixUniform( GL4 gl ) {
 		// TODO: Objective 1: make sure you send the top of the stack modeling and inverse transpose matrices to GLSL
@@ -152,21 +154,17 @@ public class BasicPipeline {
 		glUniformMatrix( gl, MMatrixID, MMatrix );
 		glUniformMatrix( gl, MinvTMatrixID, MinvTMatrix);
 	}
-	
+
 	/** 
 	 * Pushes the modeling matrix and its inverse transpose onto the stack so 
 	 * that the state can be restored later
 	 */
 	public void push() {
 		// TODO: Objective 1: stack push
-		
-		if(mStack.capacity()>64) {
-			throw new RuntimeErrorException( new Error("stack overflow") );
-		}else {
+
 			mStack.push((Matrix4d)MinvTMatrix.clone());
 			mStack.push((Matrix4d)MMatrix.clone());
-		}
-		
+
 	}
 
 	/** 
@@ -176,16 +174,12 @@ public class BasicPipeline {
 	 */
 	public void pop() {
 		// TODO: Objective 1: stack pop
-		if(mStack.isEmpty()) {
-			throw new RuntimeErrorException( new Error("stack underflow") );
-		}else {
 			MMatrix=mStack.pop();
 			MinvTMatrix=mStack.pop();
-		}
 	}
-	
+
 	private Matrix4d tmpMatrix4d = new Matrix4d();
-	
+
 	/**
 	 * Applies a translation to the current modeling matrix.
 	 * Note: setModelingMatrixUniform must be called before drawing!
@@ -196,11 +190,11 @@ public class BasicPipeline {
 	public void translate( double x, double y, double z ) {
 		// TODO: Objective 2: translate
 		tmpMatrix4d.set( new double[] {
-        		1,  0,  0,  x,
-        		0,  1,  0,  y,
-        		0,  0,  1,  z,
-        		0,  0,  0,  1,
-        } );
+				1,  0,  0,  x,
+				0,  1,  0,  y,
+				0,  0,  1,  z,
+				0,  0,  0,  1,
+		} );
 		MMatrix.mul(tmpMatrix4d);
 		tmpMatrix4d.invert(MMatrix);
 		MinvTMatrix.transpose(tmpMatrix4d);	
@@ -216,16 +210,16 @@ public class BasicPipeline {
 	public void scale( double x, double y, double z ) {
 		// TODO: Objective 2: scale
 		tmpMatrix4d.set( new double[] {
-        		x,  0,  0,  0,
-        		0,  y,  0,  0,
-        		0,  0,  z,  0,
-        		0,  0,  0,  1,
-        } );
+				x,  0,  0,  0,
+				0,  y,  0,  0,
+				0,  0,  z,  0,
+				0,  0,  0,  1,
+		} );
 		MMatrix.mul(tmpMatrix4d);
 		tmpMatrix4d.invert(MMatrix);
 		MinvTMatrix.transpose(tmpMatrix4d);
 	}
-	
+
 	/**
 	 * Applies a rotation to the current modeling matrix.
 	 * The rotation is in radians, and the axis specified by its
@@ -241,63 +235,63 @@ public class BasicPipeline {
 		MMatrix.mul(tmpMatrix4d);
 		MinvTMatrix.mul(tmpMatrix4d); // inverse transpose is the same rotation
 	}
-	
-    private float[] columnMajorMatrixData = new float[16];
-    
-    /**
-     * Wrapper to glUniformMatrix4fv for vecmath Matrix4d
-     * @param gl
-     * @param ID
-     * @param M
-     */
-    public void glUniformMatrix( GL4 gl, int ID, Matrix4d M ) {
-    	columnMajorMatrixData[0] = (float) M.m00;
-        columnMajorMatrixData[1] = (float) M.m10;
-        columnMajorMatrixData[2] = (float) M.m20;
-        columnMajorMatrixData[3] = (float) M.m30;
-        columnMajorMatrixData[4] = (float) M.m01;
-        columnMajorMatrixData[5] = (float) M.m11;
-        columnMajorMatrixData[6] = (float) M.m21;
-        columnMajorMatrixData[7] = (float) M.m31;
-        columnMajorMatrixData[8] = (float) M.m02;
-        columnMajorMatrixData[9] = (float) M.m12;
-        columnMajorMatrixData[10] = (float) M.m22;
-        columnMajorMatrixData[11] = (float) M.m32;
-        columnMajorMatrixData[12] = (float) M.m03;
-        columnMajorMatrixData[13] = (float) M.m13;
-        columnMajorMatrixData[14] = (float) M.m23;
-        columnMajorMatrixData[15] = (float) M.m33;
-        gl.glUniformMatrix4fv( ID, 1, false, columnMajorMatrixData, 0 );
-    }
-	
+
+	private float[] columnMajorMatrixData = new float[16];
+
+	/**
+	 * Wrapper to glUniformMatrix4fv for vecmath Matrix4d
+	 * @param gl
+	 * @param ID
+	 * @param M
+	 */
+	public void glUniformMatrix( GL4 gl, int ID, Matrix4d M ) {
+		columnMajorMatrixData[0] = (float) M.m00;
+		columnMajorMatrixData[1] = (float) M.m10;
+		columnMajorMatrixData[2] = (float) M.m20;
+		columnMajorMatrixData[3] = (float) M.m30;
+		columnMajorMatrixData[4] = (float) M.m01;
+		columnMajorMatrixData[5] = (float) M.m11;
+		columnMajorMatrixData[6] = (float) M.m21;
+		columnMajorMatrixData[7] = (float) M.m31;
+		columnMajorMatrixData[8] = (float) M.m02;
+		columnMajorMatrixData[9] = (float) M.m12;
+		columnMajorMatrixData[10] = (float) M.m22;
+		columnMajorMatrixData[11] = (float) M.m32;
+		columnMajorMatrixData[12] = (float) M.m03;
+		columnMajorMatrixData[13] = (float) M.m13;
+		columnMajorMatrixData[14] = (float) M.m23;
+		columnMajorMatrixData[15] = (float) M.m33;
+		gl.glUniformMatrix4fv( ID, 1, false, columnMajorMatrixData, 0 );
+	}
+
 	public void initMatricies() {
-        MMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1,  0,
-        		0,  0,  0,  1,
-        } );
-        MinvTMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1,  0,
-        		0,  0,  0,  1,
-        } );
-        VMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0,  1, -2.5,
-        		0,  0,  0,  1,
-        } );
-        PMatrix.set( new double[] {
-        		1,  0,  0,  0,
-        		0,  1,  0,  0,
-        		0,  0, -2, -3,
-        		0,  0, -1,  1,
-        } );
-    }
-    
-    /**
+		MMatrix.set( new double[] {
+				1,  0,  0,  0,
+				0,  1,  0,  0,
+				0,  0,  1,  0,
+				0,  0,  0,  1,
+		} );
+		MinvTMatrix.set( new double[] {
+				1,  0,  0,  0,
+				0,  1,  0,  0,
+				0,  0,  1,  0,
+				0,  0,  0,  1,
+		} );
+		VMatrix.set( new double[] {
+				1,  0,  0,  0,
+				0,  1,  0,  0,
+				0,  0,  1, -2.5,
+				0,  0,  0,  1,
+		} );
+		PMatrix.set( new double[] {
+				1,  0,  0,  0,
+				0,  1,  0,  0,
+				0,  0, -2, -3,
+				0,  0, -1,  1,
+		} );
+	}
+
+	/**
 	 * Creates a GLSL program from the .vp and .fp code provided in the shader directory 
 	 * @param drawable
 	 * @param name
@@ -314,9 +308,9 @@ public class BasicPipeline {
 			throw new GLException( "Couldn't link program: " + shaderProgram );
 		}	
 		shaderProgram.init(gl);
-        return shaderProgram.program();
+		return shaderProgram.program();
 	}
-	
+
 	public void drawLabel( GLAutoDrawable drawable, String text ) {
 		// Where is the origin? projected onto the screen?
 		Vector4f vec = new Vector4f(0,0,0,1);
@@ -324,12 +318,12 @@ public class BasicPipeline {
 		VMatrix.transform(vec);
 		PMatrix.transform(vec);
 		vec.scale( 1/vec.w );
-        int w = drawable.getSurfaceWidth();
-        int h = drawable.getSurfaceHeight();
-        float screenx = (float) ((vec.x + 1) / 2 * w);
-        float screeny = (float) ((1 - vec.y) / 2 * h); 
+		int w = drawable.getSurfaceWidth();
+		int h = drawable.getSurfaceHeight();
+		float screenx = (float) ((vec.x + 1) / 2 * w);
+		float screeny = (float) ((1 - vec.y) / 2 * h); 
 		fontTexture.drawTextLines(drawable, text, screenx, screeny, 32, 1,1,1 );
 		enable(drawable); // go back to our basic pipeline... but note regular context switches are expensive :(
 	}
-	
+
 }

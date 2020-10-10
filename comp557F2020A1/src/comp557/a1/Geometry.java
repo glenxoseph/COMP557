@@ -14,43 +14,45 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 
 public class Geometry extends GraphNode{
-//	Tuple3d translate;
-    
 
-	double transX, transY, transZ;
-	double rotateX, rotateY, rotateZ;
-	double scaleX, scaleY, scaleZ;
+	double tx, ty, tz;
+	double rx, ry, rz;
+	double sx, sy, sz;
+	double r, g, b;
+
 	private String shape;
-    
-float red, green, blue;
-
-	
-	public Geometry(String name, String shape,
-			double transX, double transY,double transZ, 
-			double rotateX,double rotateY,double rotateZ,
-			double scaleX, double scaleY,double scaleZ,
-			float red, float green, float blue){
+		
+	public Geometry(String name) {
 		super(name);
 		
-		this.transX = transX ;
-		this.transY = transY ;
-		this.transZ = transZ ;
-		
-		this.rotateX = rotateX ;
-		this.transY = transY ;
-		this.transZ = transZ ;
-		
-		
-		this.scaleX = scaleX;
-		this.scaleY = scaleY;
-		this.scaleZ = scaleZ;
-		
+	}
+	
+	public void setShape(String shape) {
 		this.shape = shape;
-		
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
-		
+	}
+	
+	public void setTranslate(Tuple3d translate) {
+		this.tx = translate.x;
+		this.ty = translate.y;
+		this.tz = translate.z;
+	}
+	
+	public void setScale(Tuple3d scale) {
+		this.sx = scale.x;
+		this.sy = scale.y;
+		this.sz = scale.z;
+	}
+	
+	public void setRotate(Tuple3d rotate) {
+		this.rx = rotate.x;
+		this.ry = rotate.y;
+		this.rz = rotate.z;
+	}
+	
+	public void setColor(Tuple3d color) {
+		this.r = color.x;
+		this.g = color.y;
+		this.b = color.z;
 	}
 	
 
@@ -62,28 +64,27 @@ float red, green, blue;
 		//gl.glUniform3f(pipeline.lightColorID, 1, 1, 0);
 		pipeline.setModelingMatrixUniform(gl);	
 		
-		gl.glUniform3f(pipeline.kdID, red, green, blue);
+		gl.glUniform3f(pipeline.kdID, (float) r, (float) g, (float) b);
 		
-		pipeline.translate(transX, transY, transZ);
-		pipeline.scale(scaleX, scaleY, scaleZ);
-		pipeline.rotate(rotateX, 1, 0, 0);
-		pipeline.rotate(rotateY, 0, 1, 0);
-		pipeline.rotate(rotateZ, 0, 0, 1);
+		pipeline.translate(tx, ty, tz);
+		pipeline.scale(sx, sy, sz);
+		pipeline.rotate(rx, 1, 0, 0);
+		pipeline.rotate(ry, 0, 1, 0);
+		pipeline.rotate(rz, 0, 0, 1);
 		
-
-	
-	
-      if (shape.toUpperCase().equals("CUBE")) {	
-			Cube.draw(drawable, pipeline);		
-      }else if(shape.toUpperCase().equals("SPHERE")) {
-			Sphere.draw(drawable, pipeline);
-      }else if(shape.toUpperCase().equals("SIMPLEAXIS")) {
-			SimpleAxis.draw(drawable, pipeline);
-      }else if(shape.toUpperCase().equals("QUAD")) {
-			Quad.draw(drawable, pipeline);
-		
+		if (shape.equals("CUBE")) {
+			Cube.draw(drawable, pipeline);
 		}
-
+		else if (shape.equals("SPHERE")) {
+			Sphere.draw(drawable, pipeline);
+		}
+		else if (shape.equals("SIMPLEAXIS")) {
+			SimpleAxis.draw(drawable, pipeline);
+		}
+		else if(shape.equals("QUAD")) {
+			Quad.draw(drawable, pipeline);
+		}
+		
 		super.display( drawable, pipeline );		
 		pipeline.pop();
 	}

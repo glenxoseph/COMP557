@@ -11,7 +11,7 @@ public class CharacterMaker {
 	static public String name = "CHARACTER NAME - YOUR NAME AND STUDENT NUMBER";
 	
 	// TODO: Objective 8: change default of load from file to true once you start working with xml
-	static BooleanParameter loadFromFile = new BooleanParameter( "Load from file (otherwise by procedure)", false );
+	static BooleanParameter loadFromFile = new BooleanParameter( "Load from file (otherwise by procedure)", true);
 	static JTextField baseFileName = new JTextField("data/a1data/character");
 	
 	/**
@@ -26,22 +26,32 @@ public class CharacterMaker {
 		} else {
 			// TODO: Objective 3,4,5,6: test DAG nodes by creating a small DAG in the CharacterMaker.create() method 
 			
-			Tuple3d tran = new Vector3d(1.0, 1.0, -1.0);
+			Tuple3d degrees = new Vector3d(0.5, 0.5, 0.5);
+			Tuple3d position = new Vector3d(1, 1, 1);
+			Tuple3d x = new Vector3d(-10, 10, 0.0);
+			Tuple3d y = new Vector3d(-10, 10, 0.0);
+			Tuple3d z = new Vector3d(-10, 10, 0.0);
 			
+			Tuple3d scale = new Vector3d(1, 1, 2);
+			Tuple3d rotate = new Vector3d(-10, 10, 0.0);
+			Tuple3d color = new Vector3d(0.6, 0, 0.3);
+			Tuple3d translate = new Vector3d(-1, 1, 0.0);
+			
+//			
 			GraphNode root = new FreeJoint("root");
-			GraphNode arm = new RotaryJoint("arm", 3.0, 1.0, 2.0, "y", 0.0, 90.0, 0.0);
-			SphericalJoint neck = new SphericalJoint("hand", 2, 0, -30, 30, 0, 0, -30, 30, 0, 0, -30, 30);
-			GraphNode sp = new Geometry("namr", "Sphere", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0f, 0.6f, 0.3f);
-			GraphNode sp3 = new Geometry("namr", "Cube", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0f, 0.6f, 0.3f);
-			GraphNode sp1 = new Geometry("namr", "Quad", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0f, 0.6f, 0.3f);
-			GraphNode sp2 = new Geometry("namr", "SimpleAxis", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0f, 0.6f, 0.3f);
+			SphericalJoint ha = new SphericalJoint("1");
+			ha.setDegrees(degrees, x, y, z);
+			ha.setPosition(position);
 			
-			arm.add(sp3);
-			root.add(arm);
-			root.add(neck);
-			root.add(sp);
-			neck.add(sp1);
-			neck.add(sp3);
+			Geometry ho = new Geometry("yeah");
+			ho.setShape("CUBE");
+			ho.setScale(scale);
+			ho.setRotate(rotate);
+			ho.setColor(color);
+			ho.setTranslate(translate);
+//			
+			root.add(ha);
+			ha.add(ho);
 			
 			// Use this for testing, but ultimately it will be more interesting
 			// to create your character with an xml description (see example).
