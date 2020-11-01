@@ -35,16 +35,6 @@ public class BasicPipeline {
 	public int kdID;
 	public int ksID;
 
-	public int viewDirID; 
-	public int keyDirID; 
-	public int fillDirID; 
-	public int backDirID; 
-
-	public int keyColorID; 
-	public int fillColorID; 
-	public int backColorID;
-	public int shininessID;
-
 	public int positionAttributeID; 
 	public int normalAttributeID;
 
@@ -87,13 +77,13 @@ public class BasicPipeline {
 
 		kdID = gl.glGetUniformLocation( glslProgramID, "kd" );
 		ksID = gl.glGetUniformLocation( glslProgramID, "ks" );
+		viewID= gl.glGetUniformLocation(glslProgramID, "viewDir"); 
+		keyDID= gl.glGetUniformLocation(glslProgramID, "keyD"); 
+		fillingID= gl.glGetUniformLocation(glslProgramID, "fillingD"); 
+		backDirID= gl.glGetUniformLocation(glslProgramID, "backDir");
+		
 		positionAttributeID = gl.glGetAttribLocation( glslProgramID, "position" );
 		normalAttributeID = gl.glGetAttribLocation( glslProgramID, "normal" );
-
-		viewDirID= gl.glGetUniformLocation(glslProgramID, "viewDir"); 
-		keyDirID= gl.glGetUniformLocation(glslProgramID, "keyDir"); 
-		fillDirID= gl.glGetUniformLocation(glslProgramID, "fillDir"); 
-		backDirID= gl.glGetUniformLocation(glslProgramID, "backDir");
 
 		shininessID= gl.glGetUniformLocation(glslProgramID, "shininess");
 	}
@@ -103,6 +93,15 @@ public class BasicPipeline {
 	 * the position and normal vertex attributes
 	 * @param drawable
 	 */
+	
+	public int viewID; 
+	public int keyDID; 
+	public int keyID; 
+	public int fillColorID; 
+	public int fillingID; 
+	public int backDirID; 
+	public int backColorID;
+	
 	public void enable( GLAutoDrawable drawable ) {
 		GL4 gl = drawable.getGL().getGL4();
 		gl.glUseProgram( glslProgramID );
@@ -115,36 +114,28 @@ public class BasicPipeline {
 
 		// TODO: Objective 7: GLSL lighting, you may want to provide 
 
-		Vector3f lightDir;
-		Vector3f fillColor = new Vector3f(0.3f,0.3f, 0.3f);
-		Vector3f keyColor = new Vector3f(0.8f,0.8f, 0.8f);
-		Vector3f backColor = new Vector3f(0.6f,0.6f, 0.6f);
+		Vector3f keyD = new Vector3f(0.5f, 0.5f, 0.5f);
+		Vector3f fillColor = new Vector3f(0.5f, 0.5f, 0.5f);
+		Vector3f key = new Vector3f(0.5f, 0.5f, 0.5f);
+		Vector3f backColor = new Vector3f(0.5f, 0.5f, 0.5f);
+		Vector3f view = new Vector3f(0.5f, 0.5f, 0.5f); 
 
+		keyD.normalize();
+		view.normalize();
+		fillColor.normalize();
+		backColor.normalize();
+		key.normalize();
 
-		lightDir = new Vector3f( -0.6f, 0.2f, 0.75f);
-		lightDir. normalize();
-		gl.glUniform3f( keyDirID,lightDir.x, lightDir.y, lightDir.z ); 
-		gl.glUniform3f( keyColorID, keyColor.x, keyColor.y, keyColor.z );
-
-
-		lightDir = new Vector3f(0.6f, 0.2f, 0.75f);
-		lightDir. normalize();;
-		gl.glUniform3f( fillDirID,lightDir.x, lightDir.y, lightDir.z ); 
-		gl.glUniform3f( fillColorID, fillColor.x, fillColor.y, fillColor.z );
-
-
-		lightDir = new Vector3f( 0.6f, 0.2f, -0.75f);
-		lightDir. normalize();
-		gl.glUniform3f( backDirID,lightDir.x, lightDir.y, lightDir.z ); 
+		gl.glUniform3f( keyDID, keyD.x, keyD.y, keyD.z ); 
+		gl.glUniform3f( keyID, key.x, key.y, key.z );
+		gl.glUniform3f( fillColorID, fillColor.x, fillColor.y, fillColor.z ); 
 		gl.glUniform3f( backColorID, backColor.x, backColor.y, backColor.z );
-
-
-		Vector3f viewDir = new Vector3f( 1.0f, 1.0f, 1.0f ); 
-		viewDir.normalize();
-		gl.glUniform3f(viewDirID, viewDir.x, viewDir.y, viewDir.z); 
+		gl.glUniform3f(viewID, view.x, view.y, view.z); 
 		gl.glUniform1f(shininessID, 1);
-		gl.glUniform3f(ksID, 0.9f,0.9f,0.9f);
+		gl.glUniform3f(ksID, 0.5f, 0.5f, 0.5f);
 	}
+	
+	public int shininessID;
 
 	/** Sets the modeling matrix with the current top of the stack */
 	public void setModelingMatrixUniform( GL4 gl ) {
@@ -161,9 +152,9 @@ public class BasicPipeline {
 	 */
 	public void push() {
 		// TODO: Objective 1: stack push
-
-			mStack.push((Matrix4d)MinvTMatrix.clone());
-			mStack.push((Matrix4d)MMatrix.clone());
+		
+		this.mStack.push((Matrix4d) this.MinvTMatrix.clone());
+		this.mStack.push((Matrix4d) this.MMatrix.clone());
 
 	}
 
@@ -174,8 +165,8 @@ public class BasicPipeline {
 	 */
 	public void pop() {
 		// TODO: Objective 1: stack pop
-			MMatrix=mStack.pop();
-			MinvTMatrix=mStack.pop();
+		this.MMatrix = this.mStack.pop();
+		this.MinvTMatrix = this.mStack.pop();
 	}
 
 	private Matrix4d tmpMatrix4d = new Matrix4d();
